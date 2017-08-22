@@ -1,0 +1,27 @@
+//
+//  WASDemo.pch
+//  WASLoginDemo
+//
+//  Created by 王璋杰 on 2017/8/22.
+//  Copyright © 2017年 sec. All rights reserved.
+//
+
+#ifndef WASDemo_pch
+#define WASDemo_pch
+
+/*
+ 获取屏幕宽度与高度
+ */
+#define SCREEN_WIDTH  [UIScreen mainScreen].bounds.size.width
+#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
+//相对iphone6 屏幕宽度比
+#define KWidth_Scale    [UIScreen mainScreen].bounds.size.width/375.0f
+//相对iPhone6 屏幕高度比
+#define KHeight_Scale [UIScreen mainScreen].bounds.size.height/667.0f
+
+
+#endif /* WASDemo_pch */
+/*
+/Users/andysection/Desktop/WASLoginDemo/WASLoginDemo/WASLoginDemo/WASDemo.pch
+/Users/andysection/Desktop/WASLoginDemo/WASLoginDemo/<built-in>:1:10: '/WASLoginDemo/WASLoginDemo/WASDemo.pch' file not found
+*/

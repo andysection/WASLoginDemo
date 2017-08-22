@@ -13,6 +13,8 @@
 		6DA59B091F4C6C0D0040DE8C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6DA59B071F4C6C0D0040DE8C /* Main.storyboard */; };
 		6DA59B0B1F4C6C0D0040DE8C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6DA59B0A1F4C6C0D0040DE8C /* Assets.xcassets */; };
 		6DA59B0E1F4C6C0D0040DE8C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6DA59B0C1F4C6C0D0040DE8C /* LaunchScreen.storyboard */; };
+		6DA59B171F4C725F0040DE8C /* WASLoginView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA59B161F4C725F0040DE8C /* WASLoginView.m */; };
+		6DA59B1A1F4C77240040DE8C /* WASSignView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DA59B191F4C77240040DE8C /* WASSignView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,11 @@
 		6DA59B0A1F4C6C0D0040DE8C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6DA59B0D1F4C6C0D0040DE8C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6DA59B0F1F4C6C0D0040DE8C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6DA59B151F4C725F0040DE8C /* WASLoginView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WASLoginView.h; sourceTree = "<group>"; };
+		6DA59B161F4C725F0040DE8C /* WASLoginView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WASLoginView.m; sourceTree = "<group>"; };
+		6DA59B181F4C77240040DE8C /* WASSignView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WASSignView.h; sourceTree = "<group>"; };
+		6DA59B191F4C77240040DE8C /* WASSignView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WASSignView.m; sourceTree = "<group>"; };
+		6DA59B1B1F4C7A6B0040DE8C /* WASDemo.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WASDemo.pch; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +74,11 @@
 				6DA59B0C1F4C6C0D0040DE8C /* LaunchScreen.storyboard */,
 				6DA59B0F1F4C6C0D0040DE8C /* Info.plist */,
 				6DA59AFE1F4C6C0D0040DE8C /* Supporting Files */,
+				6DA59B151F4C725F0040DE8C /* WASLoginView.h */,
+				6DA59B161F4C725F0040DE8C /* WASLoginView.m */,
+				6DA59B181F4C77240040DE8C /* WASSignView.h */,
+				6DA59B191F4C77240040DE8C /* WASSignView.m */,
+				6DA59B1B1F4C7A6B0040DE8C /* WASDemo.pch */,
 			);
 			path = WASLoginDemo;
 			sourceTree = "<group>";
@@ -105,6 +117,7 @@
 		6DA59AF31F4C6C0D0040DE8C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = WAS;
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = sec;
 				TargetAttributes = {
@@ -150,9 +163,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DA59B171F4C725F0040DE8C /* WASLoginView.m in Sources */,
 				6DA59B061F4C6C0D0040DE8C /* ViewController.m in Sources */,
 				6DA59B031F4C6C0D0040DE8C /* AppDelegate.m in Sources */,
 				6DA59B001F4C6C0D0040DE8C /* main.m in Sources */,
+				6DA59B1A1F4C77240040DE8C /* WASSignView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,6 +287,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = WASLoginDemo/WASDemo.pch;
 				INFOPLIST_FILE = WASLoginDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = cn.sec.WASLoginDemo;
@@ -283,6 +299,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = WASLoginDemo/WASDemo.pch;
 				INFOPLIST_FILE = WASLoginDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = cn.sec.WASLoginDemo;
@@ -309,6 +326,7 @@
 				6DA59B141F4C6C0D0040DE8C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
