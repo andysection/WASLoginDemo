@@ -18,9 +18,13 @@ static float zTransform = 50.0f;
 @property (nonatomic, weak) WASSignView *signView;
 @property (nonatomic, assign) NSInteger flag;
 @property (nonatomic, assign) CATransform3D LoginTransform0;
-@property (nonatomic, assign) CATransform3D LoginTransform2;
+@property (nonatomic, assign) CATransform3D LoginTransformBack;
 @property (nonatomic, assign) CATransform3D SignTransform0;
 @property (nonatomic, assign) CATransform3D SignTransform2;
+
+//动画属性 只可读
+@property (nonatomic, strong) CAAnimationGroup * animGLoginForward;
+@property (nonatomic, strong) CAAnimationGroup * animGLoginBackward;
 
 @end
 
@@ -47,35 +51,26 @@ static float zTransform = 50.0f;
     self.view.layer.sublayerTransform = perspective;
     
     _loginView.layer.transform = _LoginTransform0;
-    _signView.layer.transform = _SignTransform0;
+    _signView.layer.transform = CATransform3DIdentity;
     
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    _flag = (_flag + 1 )% 4;
-    switch (_flag) {
-        case 0:
-            [self animationLoginTransform:_LoginTransform0 SignTransForm:_SignTransform0];
-            break;
-        case 1:
-        case 3:
-            [self animationLoginTransform:CATransform3DIdentity SignTransForm:CATransform3DIdentity];
-            break;
-        case 2:
-            [self animationLoginTransform:_LoginTransform2 SignTransForm:_SignTransform2];
-            break;
-            
-        default:
-            break;
-    }
-    NSLog(@"%zd",_flag);
+    CABasicAnimation *LoginAnimForForward2Mid = [CABasicAnimation animationWithKeyPath:@"transform"];
+    LoginAnimForForward2Mid.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
     
-////        CGPoint point = [[touches anyObject] locationInView:self.view];
-//    [UIView animateWithDuration:1.5 animations:^{
-////        _loginView.layer.position = point;
-//        _loginView.layer.transform = transform1;
-//        _signView.layer.transform = transform2;
-//    }];
+    CABasicAnimation *LoginAnimForMid2Back = [CABasicAnimation animationWithKeyPath:@"transform"];
+    LoginAnimForMid2Back.toValue = [NSValue valueWithCATransform3D:_LoginTransformBack];
+    
+    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
+    animGroup.animations = @[LoginAnimForForward2Mid, LoginAnimForMid2Back];
+    animGroup.duration = 1.0f;
+    animGroup.fillMode = kCAFillModeForwards;
+    
+    [_loginView.layer addAnimation:animGroup forKey:nil];
+    _loginView.layer.transform = _LoginTransformBack;
+    
+    return;
 }
 
 - (void)animationLoginTransform:(CATransform3D)tf1 SignTransForm:(CATransform3D)tf2{
@@ -84,10 +79,26 @@ static float zTransform = 50.0f;
         _signView.layer.transform = tf2;
     }];
 }
+//减少重复代码
+- (CAAnimationGroup *)getAnimationGroupWithTransform1:(CATransform3D)tf1 Transform2:(CATransform3D)tf2{
+    CABasicAnimation *anim1 = [CABasicAnimation animationWithKeyPath:@"transform"];
+    anim1.toValue = [NSValue valueWithCATransform3D:tf1];
+    
+    CABasicAnimation *anim2 = [CABasicAnimation animationWithKeyPath:@"transform"];
+    anim2.toValue = [NSValue valueWithCATransform3D:tf2];
+    
+    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
+    animGroup.duration = 1.0f;
+    animGroup.fillMode = kCAFillModeForwards;
+    animGroup.removedOnCompletion = YES;
+    animGroup.animations = @[anim1, anim2];
+    return animGroup;
+}
 
 - (void)dataSet{
     _LoginTransform0 = CATransform3DMakeTranslation(viewWidth / 3.0, 0, zTransform);
-    _LoginTransform2 = CATransform3DMakeTranslation(viewWidth / 6.0, 0, -zTransform);
+    _LoginTransformBack = CATransform3DMakeTranslation(viewWidth / 6.0, 0, -zTransform);
+//    _LoginTransform2 = CATransform3DTranslate(CATransform3DIdentity, viewWidth / 6.0, 0, -zTransform);
     
     _SignTransform0 = CATransform3DMakeTranslation(-viewWidth / 6.0, 0, -zTransform);
     _SignTransform2 = CATransform3DMakeTranslation(-viewWidth / 3.0, 0, zTransform);
