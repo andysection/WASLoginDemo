@@ -11,20 +11,26 @@
 #import "WASSignView.h"
 static float viewWidth = 150.0f;
 static float zTransform = 50.0f;
+typedef enum : NSUInteger {
+    ViewFrontTypeLogin = 0,
+    ViewFrontTypeSign,
+} ViewFrontType;
 
 @interface ViewController ()
 
 @property (nonatomic, weak) WASLoginView *loginView;
 @property (nonatomic, weak) WASSignView *signView;
-@property (nonatomic, assign) NSInteger flag;
-@property (nonatomic, assign) CATransform3D LoginTransform0;
-@property (nonatomic, assign) CATransform3D LoginTransformBack;
-@property (nonatomic, assign) CATransform3D SignTransform0;
-@property (nonatomic, assign) CATransform3D SignTransform2;
+@property (nonatomic, assign) ViewFrontType viewFrontType;
 
 //动画属性 只可读
-@property (nonatomic, strong) CAAnimationGroup * animGLoginForward;
-@property (nonatomic, strong) CAAnimationGroup * animGLoginBackward;
+@property (nonatomic, assign, readonly) CATransform3D LoginTransformForward;
+@property (nonatomic, assign, readonly) CATransform3D LoginTransformBackward;
+@property (nonatomic, assign, readonly) CATransform3D SignTransformBackward;
+@property (nonatomic, assign, readonly) CATransform3D SignTransformForward;
+@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupLoginForward;
+@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupLoginBackward;
+@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupSignForward;
+@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupSignBackward;
 
 @end
 
@@ -33,9 +39,15 @@ static float zTransform = 50.0f;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self dataSet];
-    _flag = 0;
+    [self setupUI];
     
+    _viewFrontType = ViewFrontTypeLogin;
+    _loginView.layer.transform = self.LoginTransformForward;
+    _signView.layer.transform = self.SignTransformBackward;
+    
+}
+
+- (void)setupUI{
     self.view.backgroundColor = [UIColor colorWithRed:59.0/255 green:69.0/255 blue:100.0/255 alpha:1.0];
     
     WASLoginView *loginView = [[WASLoginView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH / 2 - viewWidth , 200, viewWidth, 200)];
@@ -50,60 +62,94 @@ static float zTransform = 50.0f;
     perspective.m34 = - 1.0 / 500.0;
     self.view.layer.sublayerTransform = perspective;
     
-    _loginView.layer.transform = _LoginTransform0;
-    _signView.layer.transform = CATransform3DIdentity;
-    
+    UIView *line = [[UIView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/2-viewWidth, 0, 1, 667)];
+    line.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:line];
 }
-
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    CABasicAnimation *LoginAnimForForward2Mid = [CABasicAnimation animationWithKeyPath:@"transform"];
-    LoginAnimForForward2Mid.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
-    
-    CABasicAnimation *LoginAnimForMid2Back = [CABasicAnimation animationWithKeyPath:@"transform"];
-    LoginAnimForMid2Back.toValue = [NSValue valueWithCATransform3D:_LoginTransformBack];
-    
-    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-    animGroup.animations = @[LoginAnimForForward2Mid, LoginAnimForMid2Back];
-    animGroup.duration = 1.0f;
-    animGroup.fillMode = kCAFillModeForwards;
-    
-    [_loginView.layer addAnimation:animGroup forKey:nil];
-    _loginView.layer.transform = _LoginTransformBack;
+    [self viewFrontTypeChanged];
     
     return;
 }
 
-- (void)animationLoginTransform:(CATransform3D)tf1 SignTransForm:(CATransform3D)tf2{
-    [UIView animateWithDuration:1 animations:^{
-        _loginView.layer.transform = tf1;
-        _signView.layer.transform = tf2;
-    }];
+- (void)setViewFrontType:(ViewFrontType)viewFrontType{
+    //进行动画 显示LOGIN
+    CAAnimationGroup *LoginAnimGroup = self.animGroupLoginForward;
+    CATransform3D loginTransform = self.LoginTransformForward;
+    CAAnimationGroup *SignAnimGroup = self.animGroupSignBackward;
+    CATransform3D signTransform = self.SignTransformBackward;
+    //显示SIGN
+    if (viewFrontType == ViewFrontTypeSign) {
+        LoginAnimGroup = self.animGroupLoginBackward;
+        loginTransform = self.LoginTransformBackward;
+        SignAnimGroup = self.animGroupSignForward;
+        signTransform = self.SignTransformForward;
+    }
+    
+    //添加组动画
+    [self.loginView.layer addAnimation:LoginAnimGroup forKey:nil];
+    [self.signView.layer addAnimation:SignAnimGroup forKey:nil];
+    //设置tranform正确属性
+    self.loginView.layer.transform = loginTransform;
+    self.signView.layer.transform = signTransform;
+    
+    _viewFrontType = viewFrontType;
 }
+//更换菜单界面
+- (void)viewFrontTypeChanged{
+    self.viewFrontType = !_viewFrontType;
+    NSLog(@"%zd", _viewFrontType);
+}
+
 //减少重复代码
-- (CAAnimationGroup *)getAnimationGroupWithTransform1:(CATransform3D)tf1 Transform2:(CATransform3D)tf2{
+- (CAAnimationGroup *)getAnimationGroupWithTargetTransform:(CATransform3D)tf fromTransform:(CATransform3D)ftf{
     CABasicAnimation *anim1 = [CABasicAnimation animationWithKeyPath:@"transform"];
-    anim1.toValue = [NSValue valueWithCATransform3D:tf1];
+    anim1.fromValue = [NSValue valueWithCATransform3D:ftf];
+    anim1.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
     
     CABasicAnimation *anim2 = [CABasicAnimation animationWithKeyPath:@"transform"];
-    anim2.toValue = [NSValue valueWithCATransform3D:tf2];
+    anim2.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
     
     CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-    animGroup.duration = 1.0f;
+    animGroup.duration = 8.0f;
     animGroup.fillMode = kCAFillModeForwards;
-    animGroup.removedOnCompletion = YES;
+    animGroup.removedOnCompletion = NO;
     animGroup.animations = @[anim1, anim2];
     return animGroup;
 }
 
-- (void)dataSet{
-    _LoginTransform0 = CATransform3DMakeTranslation(viewWidth / 3.0, 0, zTransform);
-    _LoginTransformBack = CATransform3DMakeTranslation(viewWidth / 6.0, 0, -zTransform);
-//    _LoginTransform2 = CATransform3DTranslate(CATransform3DIdentity, viewWidth / 6.0, 0, -zTransform);
-    
-    _SignTransform0 = CATransform3DMakeTranslation(-viewWidth / 6.0, 0, -zTransform);
-    _SignTransform2 = CATransform3DMakeTranslation(-viewWidth / 3.0, 0, zTransform);
+# pragma mark - readonly Property Transform3D
+- (CATransform3D)LoginTransformForward{
+    return CATransform3DMakeTranslation(viewWidth / 3, 0, zTransform);
 }
 
+-(CATransform3D)LoginTransformBackward{
+    return CATransform3DMakeTranslation(viewWidth / 3, 0, -zTransform);
+}
+
+-(CATransform3D)SignTransformBackward{
+    return CATransform3DMakeTranslation(-viewWidth / 3, 0, -zTransform);
+}
+
+- (CATransform3D)SignTransformForward{
+    return CATransform3DMakeTranslation(-viewWidth / 3, 0, zTransform);
+}
+# pragma mark - readonly Property AnimationGroup
+- (CAAnimationGroup *)animGroupLoginBackward{
+    return [self getAnimationGroupWithTargetTransform:self.LoginTransformBackward fromTransform:self.LoginTransformForward];
+}
+
+- (CAAnimationGroup *)animGroupLoginForward{
+    return [self getAnimationGroupWithTargetTransform:self.LoginTransformForward fromTransform:self.LoginTransformBackward];
+}
+
+- (CAAnimationGroup *)animGroupSignForward{
+    return [self getAnimationGroupWithTargetTransform:self.SignTransformForward fromTransform:self.SignTransformBackward];
+}
+
+- (CAAnimationGroup *)animGroupSignBackward{
+    return [self getAnimationGroupWithTargetTransform:self.SignTransformBackward fromTransform:self.SignTransformForward];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
