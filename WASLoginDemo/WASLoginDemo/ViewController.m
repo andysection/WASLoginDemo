@@ -27,10 +27,10 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign, readonly) CATransform3D LoginTransformBackward;
 @property (nonatomic, assign, readonly) CATransform3D SignTransformBackward;
 @property (nonatomic, assign, readonly) CATransform3D SignTransformForward;
-@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupLoginForward;
-@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupLoginBackward;
-@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupSignForward;
-@property (nonatomic, strong, readonly) CAAnimationGroup * animGroupSignBackward;
+@property (nonatomic, strong, readonly) CAKeyframeAnimation * animKeyframeLoginForward;
+@property (nonatomic, strong, readonly) CAKeyframeAnimation * animKeyframeLoginBackward;
+@property (nonatomic, strong, readonly) CAKeyframeAnimation * animKeyframeSignForward;
+@property (nonatomic, strong, readonly) CAKeyframeAnimation * animKeyframeSignBackward;
 
 @end
 
@@ -74,15 +74,15 @@ typedef enum : NSUInteger {
 
 - (void)setViewFrontType:(ViewFrontType)viewFrontType{
     //进行动画 显示LOGIN
-    CAAnimationGroup *LoginAnimGroup = self.animGroupLoginForward;
+    CAKeyframeAnimation *LoginAnimGroup = self.animKeyframeLoginForward;
     CATransform3D loginTransform = self.LoginTransformForward;
-    CAAnimationGroup *SignAnimGroup = self.animGroupSignBackward;
+    CAKeyframeAnimation *SignAnimGroup = self.animKeyframeSignBackward;
     CATransform3D signTransform = self.SignTransformBackward;
     //显示SIGN
     if (viewFrontType == ViewFrontTypeSign) {
-        LoginAnimGroup = self.animGroupLoginBackward;
+        LoginAnimGroup = self.animKeyframeLoginBackward;
         loginTransform = self.LoginTransformBackward;
-        SignAnimGroup = self.animGroupSignForward;
+        SignAnimGroup = self.animKeyframeSignForward;
         signTransform = self.SignTransformForward;
     }
     
@@ -102,20 +102,19 @@ typedef enum : NSUInteger {
 }
 
 //减少重复代码
-- (CAAnimationGroup *)getAnimationGroupWithTargetTransform:(CATransform3D)tf fromTransform:(CATransform3D)ftf{
-    CABasicAnimation *anim1 = [CABasicAnimation animationWithKeyPath:@"transform"];
-    anim1.fromValue = [NSValue valueWithCATransform3D:ftf];
-    anim1.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+- (CAKeyframeAnimation *)getKeyFrameAnimationWithTargetTransform:(CATransform3D)tf fromTransform:(CATransform3D)ftf{
+    CAKeyframeAnimation *anim = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
     
-    CABasicAnimation *anim2 = [CABasicAnimation animationWithKeyPath:@"transform"];
-    anim2.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+    NSValue *t1 = [NSValue valueWithCATransform3D:ftf];
+    NSValue *t2 = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+    NSValue *t3 = [NSValue valueWithCATransform3D:tf];
     
-    CAAnimationGroup *animGroup = [CAAnimationGroup animation];
-    animGroup.duration = 8.0f;
-    animGroup.fillMode = kCAFillModeForwards;
-    animGroup.removedOnCompletion = NO;
-    animGroup.animations = @[anim1, anim2];
-    return animGroup;
+    anim.values = @[t1, t2, t3];
+    
+    anim.duration = 8.0f;
+    anim.fillMode = kCAFillModeForwards;
+    anim.removedOnCompletion = NO;
+    return anim;
 }
 
 # pragma mark - readonly Property Transform3D
@@ -134,26 +133,21 @@ typedef enum : NSUInteger {
 - (CATransform3D)SignTransformForward{
     return CATransform3DMakeTranslation(-viewWidth / 3, 0, zTransform);
 }
-# pragma mark - readonly Property AnimationGroup
-- (CAAnimationGroup *)animGroupLoginBackward{
-    return [self getAnimationGroupWithTargetTransform:self.LoginTransformBackward fromTransform:self.LoginTransformForward];
+# pragma mark - readonly Property KeyframeAnimation
+- (CAKeyframeAnimation *)animKeyframeLoginBackward{
+    return [self getKeyFrameAnimationWithTargetTransform:self.LoginTransformBackward fromTransform:self.LoginTransformForward];
 }
 
-- (CAAnimationGroup *)animGroupLoginForward{
-    return [self getAnimationGroupWithTargetTransform:self.LoginTransformForward fromTransform:self.LoginTransformBackward];
+- (CAKeyframeAnimation *)animKeyframeLoginForward{
+    return [self getKeyFrameAnimationWithTargetTransform:self.LoginTransformForward fromTransform:self.LoginTransformBackward];
 }
 
-- (CAAnimationGroup *)animGroupSignForward{
-    return [self getAnimationGroupWithTargetTransform:self.SignTransformForward fromTransform:self.SignTransformBackward];
+- (CAKeyframeAnimation *)animKeyframeSignForward{
+    return [self getKeyFrameAnimationWithTargetTransform:self.SignTransformForward fromTransform:self.SignTransformBackward];
 }
 
-- (CAAnimationGroup *)animGroupSignBackward{
-    return [self getAnimationGroupWithTargetTransform:self.SignTransformBackward fromTransform:self.SignTransformForward];
+- (CAKeyframeAnimation *)animKeyframeSignBackward{
+    return [self getKeyFrameAnimationWithTargetTransform:self.SignTransformBackward fromTransform:self.SignTransformForward];
 }
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 
 @end
