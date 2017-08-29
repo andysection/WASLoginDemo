@@ -111,8 +111,9 @@ typedef enum : NSUInteger {
     
     anim.values = @[t1, t2, t3];
     
-    anim.duration = 8.0f;
+    anim.duration = 0.5f;
     anim.fillMode = kCAFillModeForwards;
+    [anim setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
     anim.removedOnCompletion = NO;
     return anim;
 }
